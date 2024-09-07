@@ -43,7 +43,7 @@
             ];
 
             // 男子の番号リスト（1~42から女子の番号と2を除いたもの）
-            const maleNumbers = ["4:伊伏","6:浦川","7:岡村","8:小野田","12:熊川","13:後藤","15:坂本","17:下田","24:中村かず","25:中村こう","26:布江","28:林","29:林田","30:平野","31:福島","32:福田","33:福永","34:藤田","40:山田","41:山村"]
+            const maleNumbers = ["4:伊伏","6:浦川","7:岡村","8:小野田","12:熊川","13:後藤","15:坂本","17:下田","24:中村かず","25:中村こう","26:布江","28:林","29:林田","30:平野","31:福島","32:福田","33:福永","34:藤田","40:山田","41:山村"];
 
             // シャッフル前の女子と男子のリストを作成
             const femaleStudents = femaleNumbers.map(num => `女 ${num}`);
@@ -53,12 +53,27 @@
             const remainingFemaleStudents = femaleStudents.filter(num => !fixedPairs.flat().includes(num));
             const shuffledRemainingFemaleStudents = shuffleArray(remainingFemaleStudents);
 
+            // 偶数番目にペアを挿入するためのインデックスを選ぶ
+            const availableEvenIndices = [];
+            for (let i = 0; i < shuffledRemainingFemaleStudents.length; i += 2) {
+                if (i > 0) availableEvenIndices.push(i); // 連続を避けるためにi > 0の位置から選ぶ
+            }
+            
+            // ランダムにインデックスを選択
+            const randomIndex1 = availableEvenIndices[Math.floor(Math.random() * availableEvenIndices.length)];
+            availableEvenIndices.splice(availableEvenIndices.indexOf(randomIndex1), 1); // 選んだインデックスを削除
+
+            const randomIndex2 = availableEvenIndices[Math.floor(Math.random() * availableEvenIndices.length)];
+            
+            // ペアを挿入
+            const pair1 = fixedPairs[0];
+            const pair2 = fixedPairs[1];
+
+            shuffledRemainingFemaleStudents.splice(randomIndex1, 0, ...pair1);
+            shuffledRemainingFemaleStudents.splice(randomIndex2, 0, ...pair2);
+
             // 女子リストに特定のペアを追加
-            let students = [];
-            fixedPairs.forEach(pair => {
-                students.push(...pair);
-            });
-            students = [...students, ...shuffledRemainingFemaleStudents];
+            let students = [...shuffledRemainingFemaleStudents];
 
             // 男子リストをシャッフルして追加
             students = [...students, ...shuffleArray(maleStudents)];
@@ -88,6 +103,9 @@
                     output.push(students.shift());
                 }
             }
+
+            // shuffledRemainingFemaleStudents の値をコンソールに出力
+            console.log('Shuffled Remaining Female Students with Pairs:', shuffledRemainingFemaleStudents);
 
             return output;
         }
